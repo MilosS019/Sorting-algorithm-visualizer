@@ -11,10 +11,6 @@ async function selection_sort(array){
     console.log(array)
 }
 
-function timeOut(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function selection_sort_inner_for(array, i){
     let min_num = array[i]
     let min_num_index = i
@@ -32,6 +28,35 @@ async function selection_sort_inner_for(array, i){
     swap_elements(i, min_num_index)
 }
 
+async function insertion_sort(array){
+    for(let i = 1; i < array.length; i++){
+        await insertion_sort_inner_for(array, i)
+        // await timeOut(50)
+    }
+    console.log(array)
+}
+
+async function insertion_sort_inner_for(array, i){
+    j = i - 1
+
+    while(array[j] > array[i]){
+        let element = array[j]
+        array[j] = array[i]
+        array[i] = element
+        swap_elements(i,j)
+        i--;
+        j--;
+        await timeOut(10)
+        if(j < 0) return;
+    }
+}
+
+function timeOut(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+//Swap elements on the screen
 function swap_elements(index1, index2){
     remove_class_from_previous_swap()    
 
@@ -62,6 +87,7 @@ function swap_elements(index1, index2){
     legend_item_array[index2] = value
 }
 
+//Removes color from previously swaped elements
 function remove_class_from_previous_swap(){
     if(swaped_item_index1 == -1)
         return
@@ -102,7 +128,8 @@ function generate_array(){
         array.push(num)
     }
     display_array(array)
-    selection_sort(array)
+    // selection_sort(array)
+    insertion_sort(array)
 }
 
 //Generation of random numbers for our testing array
