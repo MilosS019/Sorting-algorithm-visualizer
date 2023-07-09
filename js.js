@@ -66,6 +66,56 @@ async function bubble_sort_inner_for(array){
     }
 }
 
+async function merge_sort(array, k){
+    if(array.length <= 1)
+        return array
+    let middle_element = Math.floor(array.length / 2) 
+    // console.log(array, k ,middle_element)
+    // console.log("-----------------------------------------")
+
+    let left_half = JSON.parse(JSON.stringify(array.slice(0, middle_element)))
+    left_half = await merge_sort(left_half, k)
+    let right_half = JSON.parse(JSON.stringify(array.slice(middle_element, array.length)))
+    right_half = await merge_sort(right_half, k + middle_element)
+    let i = 0;
+    let j = 0;
+    let x = 0
+    console.log(k, middle_element)
+    console.log(left_half, right_half)
+    console.log("----------------------------------")
+    while(i < left_half.length && j < right_half.length){
+        if(left_half[i] < right_half[j]){
+            swap_elements(k + x, k + legend_item_array.indexOf(left_half[i]))
+            array[x] = left_half[i];
+            await timeOut(50) 
+            i++;
+        }else{
+            swap_elements(k + x, k + legend_item_array.indexOf(right_half[j]))
+            array[x] = right_half[j];
+            await timeOut(50) 
+            j++;
+        }
+        x+=1
+    }
+    //This is just in case not all elements from the left half have been added
+    for(let y = i; y < left_half.length; y++){
+        array[x] = left_half[y];
+        swap_elements(k + x, k + legend_item_array.indexOf(left_half[y]))
+        await timeOut(50) 
+        x += 1
+    }
+    //Same thing for the right side
+    for(let y = j; y < right_half.length; y++){
+        array[x] = right_half[y];
+        swap_elements(k + x, k + legend_item_array.indexOf(right_half[y]))
+        await timeOut(50) 
+        x += 1
+    }
+
+    return array
+
+}
+
 function timeOut(ms){
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -136,22 +186,25 @@ function display_array(array){
 }
 
 //This function generates an array for testing
-function generate_array(){
+async function generate_array(){
     let array = []
-    for(let i = 0; i < 20; i++){
-        let num = generate_number()
+    for(let i = 0; i < 10; i++){
+        let num = generate_number(1000)
         array.push(num)
     }
     display_array(array)
     // selection_sort(array)
     // insertion_sort(array)
-    bubble_sort(array)
+    // bubble_sort(array)
+    console.log(array)
+    await merge_sort(array, 0)
+    console.log(array)
 }
 
 //Generation of random numbers for our testing array
-function generate_number(){
+function generate_number(num){
     let plusMinusNum = Math.round(Math.random())
-    return plusMinusNum == 0 ? Math.random() * 1000 : Math.random() * -1000
+    return plusMinusNum == 0 ? Math.round(Math.random() * num) : Math.round(Math.random() * -num)
 }
 
 //Creating a div representing our number in the graph
