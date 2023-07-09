@@ -14,7 +14,6 @@ async function selection_sort(array){
 async function selection_sort_inner_for(array, i){
     let min_num = array[i]
     let min_num_index = i
-    console.log(i)
     for(let j = i + 1; j < array.length; j++){
         if(array[j] < min_num){
             min_num = array[j]
@@ -24,14 +23,12 @@ async function selection_sort_inner_for(array, i){
     let value = array[i]
     array[i] = min_num
     array[min_num_index] = value
-    console.log(i, min_num_index)
     swap_elements(i, min_num_index)
 }
 
 async function insertion_sort(array){
     for(let i = 1; i < array.length; i++){
         await insertion_sort_inner_for(array, i)
-        // await timeOut(50)
     }
     console.log(array)
 }
@@ -48,6 +45,24 @@ async function insertion_sort_inner_for(array, i){
         j--;
         await timeOut(10)
         if(j < 0) return;
+    }
+}
+
+async function bubble_sort(array){
+    for(let i = 0; i < array.length; i++){
+        await bubble_sort_inner_for(array)
+    }  
+}
+
+async function bubble_sort_inner_for(array){
+    for(let i = 1; i < array.length; i++){
+        if(array[i - 1] > array[i]){
+            let element = array[i];
+            array[i] = array[i - 1]
+            array[i - 1] = element
+            swap_elements(i, i-1)
+            await timeOut(10)
+        }
     }
 }
 
@@ -123,13 +138,14 @@ function display_array(array){
 //This function generates an array for testing
 function generate_array(){
     let array = []
-    for(let i = 0; i < 200; i++){
+    for(let i = 0; i < 20; i++){
         let num = generate_number()
         array.push(num)
     }
     display_array(array)
     // selection_sort(array)
-    insertion_sort(array)
+    // insertion_sort(array)
+    bubble_sort(array)
 }
 
 //Generation of random numbers for our testing array
