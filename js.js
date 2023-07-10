@@ -2,6 +2,7 @@ let swaped_item_index1 = -1;
 let swaped_item_index2 = -1;
 let items_array = []
 let legend_item_array = []
+let numbers_array = []
 
 async function selection_sort(array){
     for(let i = 0; i < array.length; i++){
@@ -69,30 +70,28 @@ async function bubble_sort_inner_for(array){
 async function merge_sort(array, k){
     if(array.length <= 1)
         return array
+        
     let middle_element = Math.floor(array.length / 2) 
-    // console.log(array, k ,middle_element)
-    // console.log("-----------------------------------------")
 
-    let left_half = JSON.parse(JSON.stringify(array.slice(0, middle_element)))
-    left_half = await merge_sort(left_half, k)
-    let right_half = JSON.parse(JSON.stringify(array.slice(middle_element, array.length)))
-    right_half = await merge_sort(right_half, k + middle_element)
+
+    let array_copy = JSON.parse(JSON.stringify(array))
+    
+    let left_half = await merge_sort(array_copy.slice(0, middle_element), k)
+    let right_half = await merge_sort(array_copy.slice(middle_element, array.length), k + middle_element)
+    //These copies are only neccesery for visualtiosation ---------
+    let left_copy = JSON.parse(JSON.stringify(left_half));  //<---|
+    let right_copy = JSON.parse(JSON.stringify(right_half));//<---|
+    array_copy = left_copy.concat(right_copy)
     let i = 0;
     let j = 0;
     let x = 0
-    console.log(k, middle_element)
-    console.log(left_half, right_half)
-    console.log("----------------------------------")
+
     while(i < left_half.length && j < right_half.length){
         if(left_half[i] < right_half[j]){
-            swap_elements(k + x, k + legend_item_array.indexOf(left_half[i]))
             array[x] = left_half[i];
-            await timeOut(50) 
             i++;
         }else{
-            swap_elements(k + x, k + legend_item_array.indexOf(right_half[j]))
             array[x] = right_half[j];
-            await timeOut(50) 
             j++;
         }
         x+=1
@@ -100,20 +99,28 @@ async function merge_sort(array, k){
     //This is just in case not all elements from the left half have been added
     for(let y = i; y < left_half.length; y++){
         array[x] = left_half[y];
-        swap_elements(k + x, k + legend_item_array.indexOf(left_half[y]))
-        await timeOut(50) 
         x += 1
     }
     //Same thing for the right side
     for(let y = j; y < right_half.length; y++){
         array[x] = right_half[y];
-        swap_elements(k + x, k + legend_item_array.indexOf(right_half[y]))
-        await timeOut(50) 
         x += 1
     }
 
+    await visualizeMerge(array_copy, array, k)
     return array
 
+}
+
+async function visualizeMerge(old_array, new_array, k){
+    for(let i = 0; i < new_array.length; i++){
+        let old_array_index = old_array.indexOf(new_array[i])
+        let val = old_array[old_array_index]
+        old_array[old_array_index] = old_array[i]
+        old_array[i] = val
+        swap_elements(k + i, k + old_array_index)
+        await timeOut(50)
+    }
 }
 
 function timeOut(ms){
@@ -130,6 +137,7 @@ function swap_elements(index1, index2){
 
     let item_legend1 = legend_item_array[index1]
     let item_legend2 = legend_item_array[index2]
+
 
     item1.classList.add("swaped")
     item2.classList.add("swaped")
@@ -150,6 +158,10 @@ function swap_elements(index1, index2){
     value = item_legend1
     legend_item_array[index1] = item_legend2
     legend_item_array[index2] = value
+
+    value = numbers_array[index1]
+    numbers_array[index1] = numbers_array[index2]
+    numbers_array[index2] = value
 }
 
 //Removes color from previously swaped elements
@@ -188,7 +200,7 @@ function display_array(array){
 //This function generates an array for testing
 async function generate_array(){
     let array = []
-    for(let i = 0; i < 10; i++){
+    for(let i = 0; i < 40; i++){
         let num = generate_number(1000)
         array.push(num)
     }
@@ -235,6 +247,7 @@ function create_legend_item(num, item_width, index){
     item.classList.add("legend_item")
     
     legend_item_array.push(item)
+    numbers_array.push(num)
 
     return item
 }
