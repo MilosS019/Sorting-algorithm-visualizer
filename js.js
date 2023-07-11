@@ -7,9 +7,8 @@ let numbers_array = []
 async function selection_sort(array){
     for(let i = 0; i < array.length; i++){
         selection_sort_inner_for(array, i)
-        await timeOut(50)
+        await time_out(50)
     }
-    console.log(array)
 }
 
 async function selection_sort_inner_for(array, i){
@@ -31,7 +30,6 @@ async function insertion_sort(array){
     for(let i = 1; i < array.length; i++){
         await insertion_sort_inner_for(array, i)
     }
-    console.log(array)
 }
 
 async function insertion_sort_inner_for(array, i){
@@ -44,7 +42,7 @@ async function insertion_sort_inner_for(array, i){
         swap_elements(i,j)
         i--;
         j--;
-        await timeOut(10)
+        await time_out(10)
         if(j < 0) return;
     }
 }
@@ -62,7 +60,7 @@ async function bubble_sort_inner_for(array){
             array[i] = array[i - 1]
             array[i - 1] = element
             swap_elements(i, i-1)
-            await timeOut(10)
+            await time_out(10)
         }
     }
 }
@@ -112,6 +110,7 @@ async function merge_sort(array, k){
 
 }
 
+//There is a bug with the visualisation for large number quantity
 async function visualizeMerge(old_array, new_array, k){
     for(let i = 0; i < new_array.length; i++){
         let old_array_index = old_array.indexOf(new_array[i])
@@ -119,11 +118,37 @@ async function visualizeMerge(old_array, new_array, k){
         old_array[old_array_index] = old_array[i]
         old_array[i] = val
         swap_elements(k + i, k + old_array_index)
-        await timeOut(50)
+        await time_out(50)
     }
 }
 
-function timeOut(ms){
+async function quick_sort(array, low, side, depth = 0){
+    if (array.length <= 1)
+        return array
+    let pivot = array[array.length - 1]
+    let higher_number_index = -1
+    for(let i = 0; i < array.length - 1; i++){
+        if(array[i] <= pivot){
+            higher_number_index += 1
+            let value = array[i]
+            array[i] = array[higher_number_index]
+            array[higher_number_index] = value
+            swap_elements(low + i, low + higher_number_index)
+            await time_out(5)
+        }
+    }
+    higher_number_index += 1
+    let value = array[higher_number_index]
+    array[higher_number_index] = array[array.length - 1]
+    array[array.length - 1] = value
+    swap_elements(low + higher_number_index, low + array.length - 1)
+    await time_out(50)
+    let left_half = await quick_sort(array.slice(0, higher_number_index), low, "l", depth + 1)
+    let right_half = await quick_sort(array.slice(higher_number_index + 1, array.length), low + higher_number_index + 1, "r", depth + 1) 
+    return [...left_half, pivot, ...right_half]
+}
+
+function time_out(ms){
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -200,7 +225,7 @@ function display_array(array){
 //This function generates an array for testing
 async function generate_array(){
     let array = []
-    for(let i = 0; i < 40; i++){
+    for(let i = 0; i < 100; i++){
         let num = generate_number(1000)
         array.push(num)
     }
@@ -208,9 +233,8 @@ async function generate_array(){
     // selection_sort(array)
     // insertion_sort(array)
     // bubble_sort(array)
-    console.log(array)
-    await merge_sort(array, 0)
-    console.log(array)
+    // await merge_sort(array, 0)
+    array = await quick_sort(array, 0)
 }
 
 //Generation of random numbers for our testing array
