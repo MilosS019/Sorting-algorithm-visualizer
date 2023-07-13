@@ -7,7 +7,7 @@ let numbers_array = []
 async function selection_sort(array){
     for(let i = 0; i < array.length; i++){
         selection_sort_inner_for(array, i)
-        await time_out(50)
+        await time_out(5)
     }
 }
 
@@ -42,7 +42,7 @@ async function insertion_sort_inner_for(array, i){
         swap_elements(i,j)
         i--;
         j--;
-        await time_out(10)
+        await time_out(5)
         if(j < 0) return;
     }
 }
@@ -60,7 +60,7 @@ async function bubble_sort_inner_for(array){
             array[i] = array[i - 1]
             array[i - 1] = element
             swap_elements(i, i-1)
-            await time_out(10)
+            await time_out(5)
         }
     }
 }
@@ -118,7 +118,7 @@ async function visualizeMerge(old_array, new_array, k){
         old_array[old_array_index] = old_array[i]
         old_array[i] = val
         swap_elements(k + i, k + old_array_index)
-        await time_out(50)
+        await time_out(5)
     }
 }
 
@@ -142,10 +142,77 @@ async function quick_sort(array, low, side, depth = 0){
     array[higher_number_index] = array[array.length - 1]
     array[array.length - 1] = value
     swap_elements(low + higher_number_index, low + array.length - 1)
-    await time_out(50)
+    await time_out(5)
     let left_half = await quick_sort(array.slice(0, higher_number_index), low, "l", depth + 1)
     let right_half = await quick_sort(array.slice(higher_number_index + 1, array.length), low + higher_number_index + 1, "r", depth + 1) 
     return [...left_half, pivot, ...right_half]
+}
+
+async function heap_sort(array){
+    let array_size = array.length;
+
+    for(let i = Math.floor(array_size / 2) - 1; i >= 0; i--)
+        array = await heapify(array, array_size, i, 0);
+
+    console.log(array)
+    
+    let last_element_index = array_size - 1;
+    let sorted_array = []
+    for(let i = 0; i < array_size; i++){
+        sorted_array.push(array[0])
+        array[0] = array[last_element_index];
+        array = array.splice(0, last_element_index)
+        last_element_index -= 1
+        swap_elements(0, array_size - i - 1)
+        time_out(50)
+        array = await heapify(array, array_size, 0)
+    }
+
+    console.log(sorted_array)
+    
+}
+
+async function heapify_one_level(array, array_size, i){
+    let left_child_index = 2 * i + 1;
+    let right_child_index = 2 * i + 2;
+    let swaped_element_index = i
+    let swaped = false;
+    let largest_element_index = i  
+    if(left_child_index < array_size){
+        if(array[left_child_index] > array[largest_element_index]){
+            largest_element_index = left_child_index
+        }
+    }
+    if(right_child_index < array_size){
+        if(array[right_child_index] > array[largest_element_index]){
+            largest_element_index = right_child_index
+        }
+    }
+
+    if(largest_element_index != i){
+        swap_elements(i, largest_element_index)
+        await time_out(50)
+        let value = array[i]
+        array[i] = array[largest_element_index]
+        array[largest_element_index] = value
+        swaped_element_index = largest_element_index
+        swaped = true
+    }
+
+    return [swaped_element_index, array, swaped];
+}
+
+async function heapify(array, array_size, i){
+    if(i >= array_size)
+        return array
+    let return_values = await heapify_one_level(array, array_size, i)
+    let next_element_index = return_values[0]
+    array = return_values[1]
+    // console.log(array)
+    let swaped = return_values[2]
+    if(!swaped)
+        return array
+    return heapify(array, array_size, next_element_index)
 }
 
 function time_out(ms){
@@ -234,7 +301,8 @@ async function generate_array(){
     // insertion_sort(array)
     // bubble_sort(array)
     // await merge_sort(array, 0)
-    array = await quick_sort(array, 0)
+    // array = await quick_sort(array, 0)
+    array = heap_sort(array)
 }
 
 //Generation of random numbers for our testing array
