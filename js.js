@@ -4,16 +4,18 @@ let items_array = []
 let legend_item_array = []
 let numbers_array = []
 let visualisation_speed = 50
+let number_limit = 1000
+let arr_size = 0
 
-async function selection_sort(array){
+async function selection_sort(array, offset = 0){
     for(let i = 0; i < array.length; i++){
-        array = await selection_sort_inner_for(array, i)
+        array = await selection_sort_inner_for(array, i, offset)
         await time_out()
     }
     return array
 }
 
-async function selection_sort_inner_for(array, i){
+async function selection_sort_inner_for(array, i, offset){
     let min_num = array[i]
     let min_num_index = i
     for(let j = i + 1; j < array.length; j++){
@@ -25,7 +27,7 @@ async function selection_sort_inner_for(array, i){
     let value = array[i]
     array[i] = min_num
     array[min_num_index] = value
-    swap_elements(i, min_num_index)
+    swap_elements(i + offset, min_num_index + offset)
     return array
 }
 
@@ -222,6 +224,31 @@ async function heapify(array, array_size, i){
     return heapify(array, array_size, next_element_index)
 }
 
+async function bucket_sort(array){
+    let empty_arr = []
+    let buckets_num = Math.round(arr_size / 10)
+    let divider = number_limit * 2 / buckets_num
+    for(let i = 0; i < buckets_num + 1; i++){
+        empty_arr.push([])
+    } 
+
+    for(let num of array){
+        empty_arr[Math.round((num + number_limit) / divider)].push(num)
+    }
+
+    let offset = 0
+    for(let i = 0; i < buckets_num; i++){
+        if(i == 0)
+            empty_arr[i] = await selection_sort(empty_arr[i])
+        else{
+            offset += empty_arr[i - 1].length
+            empty_arr[i] = await selection_sort(empty_arr[i], offset)
+        }
+    }
+    console.log(empty_arr)
+    return empty_arr
+}
+
 function time_out(){
     return new Promise(resolve => setTimeout(resolve, visualisation_speed));
 }
@@ -307,8 +334,10 @@ async function generate_array(){
     let array = []
     let size, speed, func;
     [size, speed, func] = await get_input_field_values()
+    visualisation_speed = speed
+    arr_size = size
     for(let i = 0; i < size; i++){
-        let num = generate_number(1000)
+        let num = generate_number(number_limit)
         array.push(num)
     }
     display_array(array)
@@ -350,6 +379,8 @@ function get_sorting_function(algorythm){
             return quick_sort
         case 'heap':
             return heap_sort
+        case 'bucket':
+            return bucket_sort
         default:
             alert("No algorytm selected")
             return false
