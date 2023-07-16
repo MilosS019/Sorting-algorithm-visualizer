@@ -16,7 +16,7 @@ body{
     margin: 0 20px;
 }
 
-.speed_input{
+.input{
     display: inline-block;
 }
 
@@ -35,8 +35,9 @@ body{
 
 .item{
     background-color: aqua;
-    border: 1px solid black;
+    border: 1px solid rgb(57, 57, 57);
     box-sizing: border-box;
+    border-radius: 4px 4px 0px 0px;
 }
 
 .legend_item{
@@ -51,6 +52,19 @@ body{
     text-align: center;
 }
 
+#algorythm_selection{
+    margin-left: 20px;
+}
+
 .swaped{
     background-color: red;
+}
+
+#start_button{
+    width: 200px;
+    height: 25px;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 25px;
+    cursor: pointer;
 }

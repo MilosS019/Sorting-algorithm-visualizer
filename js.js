@@ -3,12 +3,14 @@ let swaped_item_index2 = -1;
 let items_array = []
 let legend_item_array = []
 let numbers_array = []
+let visualisation_speed = 50
 
 async function selection_sort(array){
     for(let i = 0; i < array.length; i++){
-        selection_sort_inner_for(array, i)
-        await time_out(5)
+        array = await selection_sort_inner_for(array, i)
+        await time_out()
     }
+    return array
 }
 
 async function selection_sort_inner_for(array, i){
@@ -24,12 +26,14 @@ async function selection_sort_inner_for(array, i){
     array[i] = min_num
     array[min_num_index] = value
     swap_elements(i, min_num_index)
+    return array
 }
 
 async function insertion_sort(array){
     for(let i = 1; i < array.length; i++){
-        await insertion_sort_inner_for(array, i)
+        array = await insertion_sort_inner_for(array, i)
     }
+    return array
 }
 
 async function insertion_sort_inner_for(array, i){
@@ -42,15 +46,17 @@ async function insertion_sort_inner_for(array, i){
         swap_elements(i,j)
         i--;
         j--;
-        await time_out(5)
+        await time_out()
         if(j < 0) return;
     }
+    return array
 }
 
 async function bubble_sort(array){
     for(let i = 0; i < array.length; i++){
-        await bubble_sort_inner_for(array)
+        array = await bubble_sort_inner_for(array)
     }  
+    return array
 }
 
 async function bubble_sort_inner_for(array){
@@ -60,12 +66,13 @@ async function bubble_sort_inner_for(array){
             array[i] = array[i - 1]
             array[i - 1] = element
             swap_elements(i, i-1)
-            await time_out(5)
+            await time_out()
         }
     }
+    return array
 }
 
-async function merge_sort(array, k){
+async function merge_sort(array, k = 0){
     if(array.length <= 1)
         return array
         
@@ -118,11 +125,11 @@ async function visualizeMerge(old_array, new_array, k){
         old_array[old_array_index] = old_array[i]
         old_array[i] = val
         swap_elements(k + i, k + old_array_index)
-        await time_out(5)
+        await time_out()
     }
 }
 
-async function quick_sort(array, low, side, depth = 0){
+async function quick_sort(array, low = 0, depth = 0){
     if (array.length <= 1)
         return array
     let pivot = array[array.length - 1]
@@ -134,7 +141,7 @@ async function quick_sort(array, low, side, depth = 0){
             array[i] = array[higher_number_index]
             array[higher_number_index] = value
             swap_elements(low + i, low + higher_number_index)
-            await time_out(5)
+            await time_out()
         }
     }
     higher_number_index += 1
@@ -142,9 +149,9 @@ async function quick_sort(array, low, side, depth = 0){
     array[higher_number_index] = array[array.length - 1]
     array[array.length - 1] = value
     swap_elements(low + higher_number_index, low + array.length - 1)
-    await time_out(5)
-    let left_half = await quick_sort(array.slice(0, higher_number_index), low, "l", depth + 1)
-    let right_half = await quick_sort(array.slice(higher_number_index + 1, array.length), low + higher_number_index + 1, "r", depth + 1) 
+    await time_out()
+    let left_half = await quick_sort(array.slice(0, higher_number_index), low, depth + 1)
+    let right_half = await quick_sort(array.slice(higher_number_index + 1, array.length), low + higher_number_index + 1, depth + 1) 
     return [...left_half, pivot, ...right_half]
 }
 
@@ -164,7 +171,7 @@ async function heap_sort(array){
         array = array.splice(0, last_element_index)
         last_element_index -= 1
         swap_elements(0, array_size - i - 1)
-        time_out(50)
+        // time_out(50)
         array = await heapify(array, array_size, 0)
     }
 
@@ -191,7 +198,7 @@ async function heapify_one_level(array, array_size, i){
 
     if(largest_element_index != i){
         swap_elements(i, largest_element_index)
-        await time_out(50)
+        await time_out()
         let value = array[i]
         array[i] = array[largest_element_index]
         array[largest_element_index] = value
@@ -215,8 +222,8 @@ async function heapify(array, array_size, i){
     return heapify(array, array_size, next_element_index)
 }
 
-function time_out(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
+function time_out(){
+    return new Promise(resolve => setTimeout(resolve, visualisation_speed));
 }
 
 
@@ -278,6 +285,12 @@ function display_array(array){
     let graph = document.getElementById("graph");
     let values_legend = document.getElementById("values_legend");
 
+    graph.innerHTML = ""
+    values_legend.innerHTML = ""
+    items_array = []
+    numbers_array = []
+    legend_item_array = []
+
     let index = 0
     for(let num of array){
         let item = create_graph_item(num, min_element, divider, item_width, index)
@@ -292,17 +305,55 @@ function display_array(array){
 //This function generates an array for testing
 async function generate_array(){
     let array = []
-    for(let i = 0; i < 100; i++){
+    let size, speed, func;
+    [size, speed, func] = await get_input_field_values()
+    for(let i = 0; i < size; i++){
         let num = generate_number(1000)
         array.push(num)
     }
     display_array(array)
-    // selection_sort(array)
-    // insertion_sort(array)
-    // bubble_sort(array)
-    // await merge_sort(array, 0)
-    // array = await quick_sort(array, 0)
-    array = heap_sort(array)
+    array = func(array)
+}
+
+async function get_input_field_values(){
+    let array_size_div = document.getElementById("array_size");
+    let speed_div = document.getElementById("speed");
+    let algorythm_div = document.getElementById("algorythms")
+
+    let size_value = array_size_div.value
+    let speed_value = speed_div.value
+    let algorythm_value = algorythm_div.value
+    console.log(algorythm_value)
+    let sorting_func = get_sorting_function(algorythm_value)
+    if(!sorting_func) return
+    try{
+        let size_int = parseInt(size_value)
+        let speed_int = parseInt(speed_value)
+        return [size_int, speed_int, sorting_func]
+    }catch{
+        throw Error("Invalid input")
+    }
+} 
+
+function get_sorting_function(algorythm){
+    console.log(algorythm)
+    switch(algorythm){
+        case 'selection':
+            return selection_sort
+        case 'insertion':
+            return insertion_sort
+        case 'bubble':
+            return bubble_sort
+        case 'merge':
+            return merge_sort
+        case 'quick':
+            return quick_sort
+        case 'heap':
+            return heap_sort
+        default:
+            alert("No algorytm selected")
+            return false
+    }
 }
 
 //Generation of random numbers for our testing array
