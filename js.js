@@ -237,7 +237,7 @@ async function bucket_sort(array){
     }
 
     let offset = 0
-    for(let i = 0; i < buckets_num; i++){
+    for(let i = 0; i <= buckets_num; i++){
         if(i == 0)
             empty_arr[i] = await selection_sort(empty_arr[i])
         else{
